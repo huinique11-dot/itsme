@@ -1,0 +1,10 @@
+{
+  "name": "내가 먹는 게 나",
+  "short_name": "먹는게나",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fdf6e3",
+  "theme_color": "#fdf6e3",
+  "lang": "ko",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

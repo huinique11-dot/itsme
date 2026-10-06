@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>내가 먹는 게 나</title>
+  <meta name="description" content="오늘 먹은 음식으로 만든 나, 매일 하나씩 모으는 수납장">
+  <meta name="theme-color" content="#fdf6e3">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gamja+Flower&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <h1 id="title">내가 먹는 게 나</h1>
+  </header>
+
+  <main>
+    <section id="view-today" class="view active">
+      <div class="dayline">
+        <span id="today-label"></span>
+        <span id="countdown" class="tiny"></span>
+      </div>
+
+      <div class="paper figure-card">
+        <canvas id="today-canvas" width="600" height="880"></canvas>
+        <p id="empty-hint" class="hint">아직 아무것도 안 먹었어요!<br>먹은 걸 찍으면 내 몸에 쏙~</p>
+      </div>
+
+      <div class="actions">
+        <label class="btn big">📷 먹은 거 찍기
+          <input type="file" accept="image/*" capture="environment" id="in-camera" hidden>
+        </label>
+        <label class="btn">🖼️ 앨범에서
+          <input type="file" accept="image/*" multiple id="in-album" hidden>
+        </label>
+      </div>
+      <div class="actions">
+        <label class="btn ghost">🙂 얼굴 넣기
+          <input type="file" accept="image/*" id="in-face" hidden>
+        </label>
+        <button class="btn ghost" id="btn-save" type="button">💾 그림 저장</button>
+      </div>
+
+      <h2 class="sub">오늘 먹은 것들 <small id="count"></small></h2>
+      <ul id="pieces" class="pieces"></ul>
+    </section>
+
+    <section id="view-shelf" class="view">
+      <div class="monthbar">
+        <button class="btn round" id="prev" type="button" aria-label="지난달">‹</button>
+        <h2 id="month-label"></h2>
+        <button class="btn round" id="next" type="button" aria-label="다음달">›</button>
+      </div>
+      <div class="cabinet">
+        <div class="weekdays"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+        <div id="grid" class="grid"></div>
+      </div>
+      <p class="tiny center" id="month-stat"></p>
+    </section>
+  </main>
+
+  <nav class="tabs">
+    <button class="tab active" data-view="today" type="button">🍙 오늘의 나</button>
+    <button class="tab" data-view="shelf" type="button">🗄️ 나 수납장</button>
+  </nav>
+
+  <dialog id="editor" class="sheet">
+    <h2 id="ed-title"></h2>
+    <div class="ed-stage"><canvas id="ed-canvas"></canvas></div>
+    <p id="ed-hint" class="tiny"></p>
+    <div class="tools">
+      <button type="button" class="chip" data-tool="auto">✨ 자동</button>
+      <button type="button" class="chip" data-tool="circle">⭕ 동그라미</button>
+      <button type="button" class="chip" data-tool="lasso">✍️ 손으로</button>
+      <button type="button" class="chip" data-tool="all">🖼️ 통째로</button>
+    </div>
+    <label id="ed-size-row" class="size-row">크기 <input type="range" id="ed-size" min="15" max="100" value="80"></label>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="ed-cancel">그만</button>
+      <button type="button" class="btn big" id="ed-ok">쏙 넣기!</button>
+    </div>
+  </dialog>
+
+  <dialog id="viewer" class="sheet">
+    <h2 id="v-title"></h2>
+    <div class="paper figure-card"><canvas id="v-canvas" width="600" height="880"></canvas></div>
+    <ul id="v-pieces" class="pieces"></ul>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="v-close">닫기</button>
+      <button type="button" class="btn" id="v-save">💾 그림 저장</button>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

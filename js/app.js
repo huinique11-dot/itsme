@@ -82,8 +82,14 @@ function pieceList(ul, day, editable) {
       b.className = 'x';
       b.textContent = '✕';
       b.title = '빼기';
+      // 실수로 지우지 않게 두 번 눌러야 빠진다 (폰 앱 화면에서는 confirm 창이 안 뜸)
       b.addEventListener('click', async () => {
-        if (!confirm('이거 뺄까요?')) return;
+        if (!b.classList.contains('sure')) {
+          b.classList.add('sure');
+          b.textContent = '빼기?';
+          setTimeout(() => { b.classList.remove('sure'); b.textContent = '✕'; }, 2500);
+          return;
+        }
         day.pieces.splice(i, 1);
         await saveDay(day);
         renderToday();
@@ -171,14 +177,29 @@ async function exportDay(key) {
   x.fillText(`${prettyDate(key)}의 나`, 360, 95);
   x.font = '34px "Gamja Flower", "Gaegu", cursive';
   x.fillText(`먹은 것 ${day.pieces.length}개로 만들었어요 · 내가 먹는 게 나`, 360, 1040);
-  c.toBlob((blob) => {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `나-${key}.png`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-  }, 'image/png');
+  // 폰에서는 다운로드 대신: 그림을 꾹 눌러 저장하거나, 공유 버튼으로 사진첩에 저장
+  const url = c.toDataURL('image/png');
+  const name = `나-${key}.png`;
+  $('#s-img').src = url;
+  const link = $('#s-download');
+  link.href = url;
+  link.download = name;
+  const share = $('#s-share');
+  share.hidden = true;
+  share.onclick = null;
+  link.hidden = false;
+  try {
+    const blob = await (await fetch(url)).blob();
+    const file = new File([blob], name, { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      share.hidden = false;
+      link.hidden = true;
+      share.onclick = () => navigator.share({ files: [file], title: `${prettyDate(key)}의 나` }).catch(() => {});
+    }
+  } catch { /* 공유가 안 되면 꾹 눌러 저장 */ }
+  $('#saver').showModal();
 }
+$('#s-close').addEventListener('click', () => $('#saver').close());
 $('#btn-save').addEventListener('click', () => exportDay(todayKey));
 
 // ---------- 나 수납장 ----------

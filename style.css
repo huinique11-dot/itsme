@@ -32,7 +32,10 @@ body {
   min-height: 100dvh;
   padding-bottom: calc(84px + env(safe-area-inset-bottom));
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  overscroll-behavior-y: contain;
 }
+button, .btn, .tab, .chip { -webkit-user-select: none; user-select: none; }
 
 main { max-width: 480px; margin: 0 auto; padding: 0 16px; }
 
@@ -203,6 +206,13 @@ main { max-width: 480px; margin: 0 auto; padding: 0 16px; }
 .size-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: 19px; }
 .size-row[hidden] { display: none; }
 .size-row input { flex: 1; accent-color: var(--red); }
+a.btn { text-decoration: none; }
+.saver-img {
+  display: block; width: 100%; max-height: 58dvh; object-fit: contain;
+  border: 3px solid var(--ink); border-radius: 12px; background: var(--paper);
+  -webkit-touch-callout: default;
+}
+.pieces .x.sure { width: auto; padding: 0 8px; border-radius: 14px; background: var(--red); color: #fff; }
 #viewer .figure-card { transform: none; }
 
 /* ---------- 토스트 ---------- */

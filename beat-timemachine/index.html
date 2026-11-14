@@ -6,6 +6,7 @@
 <title>비트 타임머신</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script src="config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Do+Hyeon&family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 /* Layout: one fixed 1280x720 arcade cabinet screen, scaled to fit; HTML overlays sit on top of the canvas. */
@@ -17,6 +18,7 @@
   --f-body:'Do Hyeon', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
   color-scheme:dark;
 }
+[hidden]{display:none!important}
 html,body{height:100%;margin:0;background:var(--void);color:var(--ink);overflow:hidden;font-family:var(--f-body)}
 #fit{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(ellipse at center,#15123a 0%,var(--void) 70%)}
 #cab{position:relative;width:1280px;height:720px;transform-origin:center center;flex:none;box-shadow:0 0 0 4px #2b2766,0 0 60px #2b276680}
@@ -46,6 +48,20 @@ kbd{font-family:var(--f-pixel);font-size:11px;color:var(--ink);background:#0d0b2
 .btn{all:unset;cursor:pointer;font-family:var(--f-head);font-size:24px;padding:10px 22px;background:var(--gold);color:#1b1300;box-shadow:4px 4px 0 #000;border:3px solid #000}
 .btn.ghost{background:transparent;color:var(--ink);border-color:#5a54c4}
 .btn:hover,.btn:focus-visible{filter:brightness(1.12);outline:3px solid var(--cyan);outline-offset:2px}
+#who{display:flex;align-items:center;gap:10px;font-size:19px;margin-top:10px;color:var(--ink)}
+#who .tag{font-size:16px;padding:2px 8px;border:2px solid #3b3690;background:#0d0b26}
+#who .tag.ok{color:var(--mint);border-color:var(--mint)}
+#who .tag.other{color:var(--gold);border-color:var(--gold)}
+.linkbtn{all:unset;cursor:pointer;font-size:16px;color:var(--cyan);text-decoration:underline}
+.linkbtn:focus-visible{outline:3px solid var(--cyan)}
+.form{display:grid;grid-template-columns:150px 1fr;gap:12px 16px;align-items:center;margin-top:20px}
+.form label{font-family:var(--f-head);font-size:22px}
+.form input{box-sizing:border-box;width:100%;background:#0d0b26;color:var(--ink);border:3px solid #5a54c4;font-family:var(--f-pixel);font-size:18px;padding:10px 12px}
+.form input#fNick{font-family:var(--f-body);font-size:22px}
+.form input:focus{outline:3px solid var(--cyan);outline-offset:1px}
+.form .hint{grid-column:2;font-size:16px;color:var(--dim);margin-top:-6px}
+#loginMsg{min-height:26px;font-size:19px;margin-top:14px}
+#rsSave{font-size:16px;margin-top:10px;text-align:center;color:var(--dim)}
 label.tog{display:flex;align-items:center;gap:8px;font-size:19px;cursor:pointer}
 label.tog input{width:20px;height:20px;accent-color:var(--gold)}
 .intro{display:grid;grid-template-columns:1.05fr 1fr;gap:28px}
@@ -92,6 +108,7 @@ textarea:focus{outline:3px solid var(--cyan)}
           <div>
             <div class="logo">BEAT TIME MACHINE</div>
             <div class="sub">비트 타임머신 · 시대를 날아다니며 음악 요소를 <b style="color:var(--gold)">손끝으로</b> 느껴 보자</div>
+            <div id="who"></div>
           </div>
           <label class="tog"><input type="checkbox" id="practice"> 연습 모드 (안 죽음 · 판정 넉넉)</label>
         </div>
@@ -130,6 +147,26 @@ textarea:focus{outline:3px solid var(--cyan)}
       </div>
     </div>
 
+    <!-- LOGIN -->
+    <div class="ov" id="ovLogin" hidden>
+      <div class="box" style="max-width:720px">
+        <div class="eyebrow">PLAYER ENTRY</div>
+        <h2 style="font-size:44px;margin:6px 0 6px">플레이어 등록</h2>
+        <p class="small" style="font-size:19px;line-height:1.5;margin:0">게임 기록이 선생님 기록표에 모여요. <b style="color:var(--mint)">학번과 학급코드가 맞으면 우리 반 시트</b>에, 맞지 않으면 <b style="color:var(--gold)">그외</b> 시트에 저장돼요.</p>
+        <form id="loginForm" class="form" autocomplete="off" novalidate>
+          <label for="fSid">학번</label><input id="fSid" inputmode="numeric" maxlength="5" placeholder="30105">
+          <label for="fNick">닉네임</label><input id="fNick" maxlength="12" placeholder="12자까지">
+          <label for="fCode">학급코드</label><input id="fCode" maxlength="8" placeholder="선생님께 받은 코드" style="text-transform:uppercase">
+          <div class="hint">학급코드가 없으면 비워 두세요. 그외 시트에 기록돼요.</div>
+        </form>
+        <div id="loginMsg"></div>
+        <div class="row" style="margin-top:14px;justify-content:space-between">
+          <button class="btn ghost" id="lgCancel" type="button">취소</button>
+          <button class="btn" id="lgGo" type="submit" form="loginForm">등록하고 시작 ▶</button>
+        </div>
+      </div>
+    </div>
+
     <!-- PAUSE -->
     <div class="ov" id="ovPause" hidden>
       <div class="box" style="max-width:520px;text-align:center">
@@ -150,6 +187,7 @@ textarea:focus{outline:3px solid var(--cyan)}
             <div class="eyebrow" id="rsTitle" style="text-align:center"></div>
             <div class="rank" id="rsRank">A</div>
             <div class="stats" id="rsStats"></div>
+            <div id="rsSave"></div>
           </div>
           <div class="deb">
             <h3>방금 네 손이 한 것 = 이 시대의 음악 요소</h3>
@@ -158,8 +196,11 @@ textarea:focus{outline:3px solid var(--cyan)}
               <p id="rsQ"></p>
               <textarea id="rsText" placeholder="여기에 한두 문장으로 써 보세요. (예: 내가 그 시대 사람이라면…)"></textarea>
               <div class="row" style="margin-top:8px;justify-content:space-between">
-                <span class="small" id="rsCopyMsg">다 쓰면 복사해서 모둠 공유문서에 붙여 넣어요.</span>
-                <button class="btn ghost" id="rsCopy" type="button" style="font-size:18px;padding:6px 14px">문장 복사</button>
+                <span class="small" id="rsCopyMsg">다 쓰면 제출해서 선생님 기록표에 남겨요.</span>
+                <span class="row" style="gap:10px">
+                  <button class="btn ghost" id="rsCopy" type="button" style="font-size:18px;padding:6px 14px">문장 복사</button>
+                  <button class="btn" id="rsSubmit" type="button" style="font-size:18px;padding:6px 14px">문장 제출</button>
+                </span>
               </div>
             </div>
           </div>
@@ -737,7 +778,7 @@ function loop(now){ const rdt=Math.min(.05,(now-lastRaf)/1000); lastRaf=now; if(
 
 /* ================= 화면(오버레이) ================= */
 const $=id=>document.getElementById(id);
-const OVS=['ovMenu','ovIntro','ovPause','ovResult'];
+const OVS=['ovMenu','ovIntro','ovPause','ovResult','ovLogin'];
 function showOv(id){ OVS.forEach(o=>$(o).hidden=o!==id); $('pwr').classList.toggle('show',id===null); }
 function buildMenu(){
   const best=loadBest();
@@ -747,8 +788,9 @@ function buildMenu(){
     <span class="chips">${s.chips.map(c=>`<span class="chip">${c}</span>`).join('')}</span>
     <span class="best">${best[s.id]?`BEST <b>${best[s.id].rank}</b> · ${best[s.id].score}`:'아직 안 해 봄'}</span></button>`).join('');
   $('cards').querySelectorAll('.card').forEach(b=>b.onclick=()=>openIntro(+b.dataset.i));
+  renderWho();
 }
-function openMenu(){ G.state='menu'; if(AC&&AC.state==='running'){} buildMenu(); showOv('ovMenu'); }
+function openMenu(){ G.state='menu'; buildMenu(); showOv('ovMenu'); }
 function openIntro(i){
   audioInit(); G.state='intro'; G.si=i; const s=STAGES[i];
   $('inEyebrow').textContent=`STAGE ${s.idx} · ${s.years}`; $('inEra').textContent=s.era; $('inPiece').textContent='♪ '+s.piece; $('inStory').innerHTML=s.story;
@@ -763,15 +805,16 @@ function finish(){
   const rank=tot>=.92?'S':tot>=.8?'A':tot>=.65?'B':tot>=.45?'C':'D';
   if(!G.practice) saveBest(G.st.id,rank,G.score);
   showResult(rank,notePct,dynPct,false);
+  reportPlay(rank,notePct,dynPct,false);
 }
-function gameOver(){ G.state='over'; const notePct=G.hit/G.total, dynPct=G.hit?G.dynOk/G.hit:0; showResult('×',notePct,dynPct,true); }
+function gameOver(){ G.state='over'; const notePct=G.hit/G.total, dynPct=G.hit?G.dynOk/G.hit:0; showResult('×',notePct,dynPct,true); reportPlay('×',notePct,dynPct,true); }
 function showResult(rank,notePct,dynPct,over){
   const s=G.st;
   $('rsTitle').textContent=over?'GAME OVER · 불협화음에 잡혔어요':`STAGE ${s.idx} CLEAR · ${s.era}`;
   $('rsRank').textContent=rank;
   $('rsStats').innerHTML=[['가락 잡기',Math.round(notePct*100)+'%'],['셈여림 정확도',Math.round(dynPct*100)+'%'],['PERFECT 타이밍',G.perfect],['최대 콤보',G.maxCombo],['점수',G.score]].map(([a,b])=>`<span>${a}</span><span>${b}</span>`).join('');
   $('rsDeb').innerHTML=s.deb.map(d=>`<li>${d}</li>`).join('');
-  $('rsQ').textContent='✎ '+s.q; $('rsText').value=''; $('rsCopyMsg').textContent='다 쓰면 복사해서 모둠 공유문서에 붙여 넣어요.';
+  $('rsQ').textContent='✎ '+s.q; $('rsText').value=''; $('rsCopyMsg').textContent='다 쓰면 제출해서 선생님 기록표에 남겨요.'; $('rsSubmit').disabled=false;
   $('rsNext').hidden=G.si>=STAGES.length-1;
   showOv('ovResult'); (over?$('rsRetry'):$('rsNext').hidden?$('rsMenu'):$('rsNext')).focus();
 }
@@ -831,7 +874,94 @@ $('rsCopy').onclick=()=>{
 /* ================= 화면 맞추기 ================= */
 function fit(){ const s=Math.min(innerWidth/1280,innerHeight/720); $('cab').style.transform=`scale(${s})`; }
 addEventListener('resize',fit); fit();
-buildMenu(); showOv('ovMenu');
+$('rsSubmit').onclick=()=>{
+  const txt=$('rsText').value.trim();
+  if(!txt){ $('rsCopyMsg').textContent='한 문장이라도 써야 제출할 수 있어요.'; $('rsText').focus(); return; }
+  if(!RECORD_URL){ $('rsCopyMsg').textContent='기록표가 아직 연결되지 않았어요. 복사해서 공유문서에 붙여 넣어요.'; return; }
+  $('rsSubmit').disabled=true; $('rsCopyMsg').textContent='제출하는 중…';
+  sendRecord({type:'reflection',id:G.playId,sid:PROFILE.sid,nick:PROFILE.nick,code:PROFILE.code,text:txt}).then(r=>{
+    $('rsCopyMsg').textContent=r.ok?'제출했어요! 선생님 기록표에 저장됐어요.':'인터넷이 불안정해요. 다음에 접속하면 자동으로 다시 보낼게요.';
+  });
+};
+
+/* ================= 플레이어 등록 · 기록 전송 ================= */
+// 선생님 구글 시트(Apps Script 웹 앱) 주소는 config.js 에서 넣어요.
+const RECORD_URL=(window.BTM_RECORD_URL||'').trim();
+let PROFILE=null;
+function loadProfile(){ try{ return JSON.parse(localStorage.getItem('btm_profile')||'null'); }catch(e){ return null; } }
+function saveProfile(p){ try{ localStorage.setItem('btm_profile',JSON.stringify(p)); }catch(e){} }
+function qLoad(){ try{ return JSON.parse(localStorage.getItem('btm_queue')||'[]'); }catch(e){ return []; } }
+function qSave(q){ try{ localStorage.setItem('btm_queue',JSON.stringify(q)); }catch(e){} }
+let flushing=null;
+function flush(){
+  if(flushing) return flushing;
+  flushing=(async()=>{
+    let q=qLoad(), last=null;
+    while(q.length){
+      try{
+        const r=await fetch(RECORD_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(q[0])});
+        const j=await r.json(); if(!j.ok) throw new Error(j.error||'저장 실패');
+        last=j; q.shift(); qSave(q);
+      }catch(e){ return {ok:false,pending:q.length}; }
+    }
+    return {ok:true,...(last||{})};
+  })().finally(()=>{ flushing=null; });
+  return flushing;
+}
+async function sendRecord(rec){ if(!RECORD_URL) return {ok:false,reason:'nourl'}; if(flushing) await flushing; const q=qLoad(); q.push(rec); qSave(q); return flush(); }
+function reportPlay(rank,notePct,dynPct,over){
+  const s=G.st; G.playId=Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+  const el=$('rsSave');
+  if(!RECORD_URL){ el.style.color='var(--dim)'; el.textContent='기록표 미연결 · 이 기기에만 최고 기록이 남아요'; return; }
+  el.style.color='var(--dim)'; el.textContent='기록 저장 중…';
+  sendRecord({type:'play',id:G.playId,sid:PROFILE.sid,nick:PROFILE.nick,code:PROFILE.code,stage:s.idx,era:s.era,result:over?'게임오버':'클리어',
+    rank,score:G.score,notePct:Math.round(notePct*100),dynPct:Math.round(dynPct*100),perfect:G.perfect,maxCombo:G.maxCombo,practice:G.practice})
+  .then(r=>{
+    if(r.ok){ el.style.color=r.verified?'var(--mint)':'var(--gold)'; el.textContent=`✓ 「${r.sheet}」 시트에 저장됐어요`; }
+    else { el.style.color='var(--hot)'; el.textContent=`저장 대기 중 (${r.pending}건) · 인터넷이 되면 자동으로 다시 보내요`; }
+  });
+}
+function renderWho(){
+  const w=$('who'); if(!PROFILE){ w.innerHTML=''; return; }
+  const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const tag=!RECORD_URL?'<span class="tag">기록표 미연결</span>':PROFILE.verified?`<span class="tag ok">${esc(PROFILE.sheet)} ✓</span>`:'<span class="tag other">그외</span>';
+  w.innerHTML=`<span>${esc(PROFILE.sid||'학번 없음')} · <b>${esc(PROFILE.nick)}</b></span>${tag}<button class="linkbtn" id="whoEdit" type="button">바꾸기</button>`;
+  $('whoEdit').onclick=openLogin;
+}
+function openLogin(){
+  G.state='login'; showOv('ovLogin');
+  $('fSid').value=PROFILE?.sid||''; $('fNick').value=PROFILE?.nick||''; $('fCode').value=PROFILE?.code||'';
+  $('loginMsg').textContent=RECORD_URL?'':'※ 아직 선생님 기록표가 연결되지 않아 기록은 이 기기에만 남아요.'; $('loginMsg').style.color='var(--dim)';
+  $('lgCancel').hidden=!PROFILE; $('fSid').focus();
+}
+$('lgCancel').onclick=()=>{ openMenu(); };
+$('loginForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const sid=$('fSid').value.trim(), nick=$('fNick').value.trim(), code=$('fCode').value.trim().toUpperCase();
+  const msg=$('loginMsg'); msg.style.color='var(--hot)';
+  if(sid && !/^\d{5}$/.test(sid)){ msg.textContent='학번은 숫자 5자리로 써 주세요. (예: 30105)'; $('fSid').focus(); return; }
+  if(!nick){ msg.textContent='닉네임을 써 주세요.'; $('fNick').focus(); return; }
+  const p={sid,nick,code,verified:false,sheet:'그외'};
+  if(RECORD_URL){
+    $('lgGo').disabled=true; msg.style.color='var(--dim)'; msg.textContent='학급코드 확인 중…';
+    try{
+      const r=await fetch(RECORD_URL+'?action=verify&sid='+encodeURIComponent(sid)+'&code='+encodeURIComponent(code));
+      const j=await r.json(); p.verified=!!j.verified; p.sheet=j.sheet||'그외';
+      msg.style.color=p.verified?'var(--mint)':'var(--gold)';
+      msg.textContent=p.verified?`✓ 확인됐어요! 기록은 「${p.sheet}」 시트에 저장돼요.`:'학번과 학급코드가 맞지 않아요. 이대로 하면 「그외」 시트에 저장돼요.';
+    }catch(err){ msg.style.color='var(--gold)'; msg.textContent='지금은 확인할 수 없어요. 기록을 보낼 때 다시 확인해요.'; }
+    $('lgGo').disabled=false;
+    PROFILE=p; saveProfile(p);
+    setTimeout(()=>{ if(G.state==='login') openMenu(); }, p.verified?1100:2600);
+    return;
+  }
+  PROFILE=p; saveProfile(p); openMenu();
+});
+
+PROFILE=loadProfile();
+buildMenu();
+if(PROFILE) showOv('ovMenu'); else openLogin();
+if(RECORD_URL && qLoad().length) flush();
 (document.fonts?document.fonts.ready:Promise.resolve()).then(()=>{});
 requestAnimationFrame(loop);
 </script>
